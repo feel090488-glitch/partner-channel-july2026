@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Казань — цели по субсидированию</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F6F2;
+    --bg-card: #FFFFFF;
+    --text-primary: #1C1B18;
+    --text-secondary: #6B6860;
+    --text-muted: #A09D96;
+    --border: #E2E0D8;
+    --blue: #185FA5;
+    --green: #0F6E56;
+    --green-light: #E1F5EE;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+  }
+  body { font-family: 'Geologica', sans-serif; background: var(--bg); color: var(--text-primary); padding: 32px 24px; min-height: 100vh; }
+  .page { max-width: 980px; margin: 0 auto; }
+  .header { margin-bottom: 32px; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .header h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .header-meta { font-size: 12px; color: var(--red); font-family: 'JetBrains Mono', monospace; background: var(--red-light); border: 0.5px solid #E6BABA; padding: 4px 10px; border-radius: 4px; white-space: nowrap; margin-top: 4px; }
+  .header-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.6; max-width: 720px; }
+  .assumption { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--amber); background: var(--amber-light); padding: 4px 10px; border-radius: 4px; margin-top: 10px; font-weight: 500; }
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+  .empty-state { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px; padding: 22px 24px; color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+  .empty-state strong { display: block; color: var(--green); font-size: 16px; margin-bottom: 4px; }
+  .jk-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--border); gap: 12px; flex-wrap: wrap; }
+  .card-head-left { display: flex; flex-direction: column; gap: 2px; }
+  .card-dev { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  .card-name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .card-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5; }
+  .target-badge { display: flex; flex-direction: column; align-items: center; background: var(--green-light); border: 0.5px solid #B2E2D5; border-radius: 8px; padding: 8px 14px; text-align: center; }
+  .target-badge .tb-label { font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-bottom: 2px; }
+  .target-badge .tb-value { font-size: 22px; font-weight: 600; color: var(--green); font-family: 'JetBrains Mono', monospace; line-height: 1; }
+  .target-badge .tb-unit { font-size: 11px; color: var(--green); font-weight: 500; margin-top: 1px; }
+  .steps { width: 100%; border-collapse: collapse; }
+  .steps thead tr { background: #F7F6F2; }
+  .steps th { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; border-bottom: 0.5px solid var(--border); }
+  .steps th:not(:first-child), .steps td:not(:first-child) { text-align: right; }
+  .steps td { padding: 11px 14px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  .steps tr:last-child td { border-bottom: none; }
+  .step-label { font-weight: 500; }
+  .step-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .kv-val { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--blue); white-space: nowrap; }
+  .loss-val { display: inline-flex; min-height: 28px; align-items: center; justify-content: flex-end; padding: 4px 9px; border-radius: 7px; font-family: 'JetBrains Mono', monospace; font-weight: 600; white-space: nowrap; }
+  .loss-neg { color: var(--red); background: var(--red-light); }
+  .loss-zero { color: var(--green); background: var(--green-light); }
+  .row-target { background: #F0FAF6; }
+  .target-row-label { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--green); }
+  .target-row-label::before { content: '✓'; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: var(--green); color: white; border-radius: 50%; font-size: 10px; flex-shrink: 0; }
+  .card-footer { padding: 10px 20px; background: #FAFAF8; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--text-muted); line-height: 1.6; display: flex; gap: 16px; flex-wrap: wrap; }
+  .card-footer span { display: flex; align-items: center; gap: 4px; }
+  .dot-kv, .dot-ok { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-kv { background: var(--blue); }
+  .dot-ok { background: var(--green); }
+  @media (max-width: 760px) {
+    body { padding: 20px 12px; }
+    .header-top, .card-head { flex-direction: column; align-items: flex-start; }
+    .steps th, .steps td { padding: 9px 8px; }
+  }
+  @media print {
+    body { background: white; padding: 16px; }
+    .jk-card { break-inside: avoid; }
+  }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <h1>Казань — цели по субсидированию</h1>
+      <span class="header-meta">NDA · внутренний документ</span>
+    </div>
+    <p class="header-sub">Файл показывает потенциальные потери по субсидированию: случаи, где КВ агенту выше доступной комиссии после удержания Авито.</p>
+    <div><span class="assumption">Расчёт при средней стоимости лота 11 700 000 ₽</span></div>
+  </div>
+
+  <div class="cards">
+    <section class="jk-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ООО «КамаСтройИнвест»</div>
+          <div class="card-name">ЖК «Главные роли»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+        <div class="card-head-right">
+          <div class="target-badge">
+            <div class="tb-label">Цель</div>
+            <div class="tb-value">5</div>
+            <div class="tb-unit">сделок / мес.</div>
+          </div>
+        </div>
+      </div>
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Ступень</th>
+            <th>КВ ЗС</th>
+            <th>КВ агенту</th>
+            <th>Потери на сделку</th>
+            <th>Потери накопленные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-4 квартиры</div><div class="step-note">расчёт: 4 сдел.</div></td><td><span class="kv-val">1,5%</span></td><td><span class="kv-val">1,7%</span></td><td><span class="loss-val loss-neg">58 500 ₽</span></td><td><span class="loss-val loss-neg">234 000 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">5 и более квартир</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="kv-val">2%</span></td><td><span class="kv-val">1,7%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+        </tbody>
+      </table>
+      <div class="card-footer">
+        <span><span class="dot-ok"></span>Цель — первая ступень, где потери равны нулю</span>
+      </div>
+    </section>
+
+    <section class="jk-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Компания «СМУ-88»</div>
+          <div class="card-name">ПШ по броням на Адали + Вознесенский</div>
+          <div class="card-sub">ПШ за несколько ЖК</div>
+        </div>
+        <div class="card-head-right">
+          <div class="target-badge">
+            <div class="tb-label">Цель</div>
+            <div class="tb-value">6</div>
+            <div class="tb-unit">сделок / мес.</div>
+          </div>
+        </div>
+      </div>
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Ступень</th>
+            <th>КВ ЗС</th>
+            <th>КВ агенту</th>
+            <th>Потери на сделку</th>
+            <th>Потери накопленные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">база 0-3 брони</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="kv-val">3%</span></td><td><span class="kv-val">3,2%</span></td><td><span class="loss-val loss-neg">46 800 ₽</span></td><td><span class="loss-val loss-neg">140 400 ₽</span></td></tr>
+          <tr><td><div class="step-label">3-5 броней</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="kv-val">3,3%</span></td><td><span class="kv-val">3,2%</span></td><td><span class="loss-val loss-neg">11 700 ₽</span></td><td><span class="loss-val loss-neg">58 500 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">6-9 броней</div><div class="step-note">расчёт: 9 сдел.</div></td><td><span class="kv-val">3,4%</span></td><td><span class="kv-val">3,2%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">10-13 броней</div><div class="step-note">расчёт: 13 сдел.</div></td><td><span class="kv-val">3,5%</span></td><td><span class="kv-val">3,2%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">14 и более броней</div><div class="step-note">расчёт: 14 сдел.</div></td><td><span class="kv-val">4%</span></td><td><span class="kv-val">3,6%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+        </tbody>
+      </table>
+      <div class="card-footer">
+        <span><span class="dot-ok"></span>Цель — первая ступень, где потери равны нулю</span>
+      </div>
+    </section>
+
+    <section class="jk-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Glorax</div>
+          <div class="card-name">Экосити</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+        <div class="card-head-right">
+          <div class="target-badge">
+            <div class="tb-label">Цель</div>
+            <div class="tb-value">3</div>
+            <div class="tb-unit">сделок / мес.</div>
+          </div>
+        </div>
+      </div>
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Ступень</th>
+            <th>КВ ЗС</th>
+            <th>КВ агенту</th>
+            <th>Потери на сделку</th>
+            <th>Потери накопленные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="kv-val">2%</span></td><td><span class="kv-val">2,5%</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="kv-val">2,5%</span></td><td><span class="kv-val">2,5%</span></td><td><span class="loss-val loss-neg">58 500 ₽</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">3-4 сделки</div><div class="step-note">расчёт: 4 сдел.</div></td><td><span class="kv-val">3%</span></td><td><span class="kv-val">2,5%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">от 5 сделок</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="kv-val">3,5%</span></td><td><span class="kv-val">3%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+        </tbody>
+      </table>
+      <div class="card-footer">
+        <span><span class="dot-ok"></span>Цель — первая ступень, где потери равны нулю</span>
+      </div>
+    </section>
+
+    <section class="jk-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Glorax</div>
+          <div class="card-name">Московский</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+        <div class="card-head-right">
+          <div class="target-badge">
+            <div class="tb-label">Цель</div>
+            <div class="tb-value">4</div>
+            <div class="tb-unit">сделок / мес.</div>
+          </div>
+        </div>
+      </div>
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Ступень</th>
+            <th>КВ ЗС</th>
+            <th>КВ агенту</th>
+            <th>Потери на сделку</th>
+            <th>Потери накопленные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="kv-val">2%</span></td><td><span class="kv-val">2,6%</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">2-3 сделки</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="kv-val">2,5%</span></td><td><span class="kv-val">2,6%</span></td><td><span class="loss-val loss-neg">58 500 ₽</span></td><td><span class="loss-val loss-neg">175 500 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">4-5 сделки</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="kv-val">3%</span></td><td><span class="kv-val">2,6%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">от 6 сделок</div><div class="step-note">расчёт: 6 сдел.</div></td><td><span class="kv-val">3,5%</span></td><td><span class="kv-val">3,1%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+        </tbody>
+      </table>
+      <div class="card-footer">
+        <span><span class="dot-ok"></span>Цель — первая ступень, где потери равны нулю</span>
+      </div>
+    </section>
+
+    <section class="jk-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ИнвестРесурсПлюс</div>
+          <div class="card-name">ЖК «Малевич»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+        <div class="card-head-right">
+          <div class="target-badge">
+            <div class="tb-label">Цель</div>
+            <div class="tb-value">2</div>
+            <div class="tb-unit">сделок / мес.</div>
+          </div>
+        </div>
+      </div>
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Ступень</th>
+            <th>КВ ЗС</th>
+            <th>КВ агенту</th>
+            <th>Потери на сделку</th>
+            <th>Потери накопленные</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="kv-val">5%</span></td><td><span class="kv-val">6%</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td><td><span class="loss-val loss-neg">117 000 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="kv-val">6%</span></td><td><span class="kv-val">6%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+          <tr class="row-target"><td><div class="target-row-label">от 3-х сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="kv-val">7%</span></td><td><span class="kv-val">6%</span></td><td><span class="loss-val loss-zero">0 ₽</span></td><td><span class="loss-val loss-zero">0 ₽</span></td></tr>
+        </tbody>
+      </table>
+      <div class="card-footer">
+        <span><span class="dot-ok"></span>Цель — первая ступень, где потери равны нулю</span>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

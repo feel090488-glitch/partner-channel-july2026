@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Уфа — цели по шкале</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F6F2;
+    --bg-card: #FFFFFF;
+    --text-primary: #1C1B18;
+    --text-secondary: #6B6860;
+    --text-muted: #A09D96;
+    --border: #E2E0D8;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --green: #0F6E56;
+    --green-light: #E1F5EE;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+  }
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  .page { max-width: 980px; margin: 0 auto; }
+  .header { margin-bottom: 28px; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .header-meta { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; background: var(--border); padding: 4px 10px; border-radius: 4px; white-space: nowrap; margin-top: 4px; }
+  .nda { color: var(--red); background: var(--red-light); border: 0.5px solid #E6BABA; }
+  .header-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.6; max-width: 720px; }
+  .assumption { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--amber); background: var(--amber-light); padding: 4px 10px; border-radius: 4px; margin-top: 10px; font-weight: 500; }
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+  .scale-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--border); gap: 12px; }
+  .card-dev { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  .card-name { font-size: 17px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; margin-top: 2px; }
+  .card-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+  .steps { width: 100%; border-collapse: collapse; }
+  .steps thead tr { background: #F7F6F2; }
+  .steps th { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 20px; text-align: left; border-bottom: 0.5px solid var(--border); }
+  .steps th:not(:first-child), .steps td:not(:first-child) { text-align: right; }
+  .steps td { padding: 11px 20px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  .step-label { font-weight: 500; color: var(--text-primary); }
+  .step-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .metric { font-family: 'JetBrains Mono', monospace; font-weight: 500; white-space: nowrap; }
+  .metric.blue { color: var(--blue); font-weight: 600; }
+  .metric.green { color: var(--green); font-weight: 600; }
+  .metric.muted { color: var(--text-muted); }
+  .revenue-metric { display: inline-flex; align-items: center; justify-content: flex-end; min-height: 28px; padding: 4px 9px; border-radius: 7px; background: var(--blue-light); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .calculator { padding: 14px 20px 16px; background: #FAFAF8; border-top: 0.5px solid var(--border); }
+  .calculator-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+  .calc-grid { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(180px, 1fr) auto minmax(180px, 1fr); gap: 10px; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+  input { height: 34px; border: 0.5px solid var(--border); border-radius: 6px; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); background: white; }
+  button { height: 34px; border: none; border-radius: 6px; padding: 0 14px; background: var(--blue); color: white; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+  output { min-height: 34px; display: flex; align-items: center; justify-content: flex-end; border: 0.5px solid #B2E2D5; background: var(--green-light); color: var(--green); border-radius: 6px; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+  .calc-hint { margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+  @media (max-width: 760px) {
+    body { padding: 20px 12px; }
+    .header-top { flex-direction: column; }
+    .steps th, .steps td { padding: 9px 10px; }
+    .calc-grid { grid-template-columns: 1fr; }
+    output { justify-content: flex-start; }
+  }
+  @media print {
+    body { background: white; padding: 16px; }
+    .scale-card { break-inside: avoid; }
+    .calculator { display: none; }
+  }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <h1>Уфа — цели по шкале</h1>
+      <span class="header-meta nda">NDA · внутренний документ</span>
+    </div>
+    <p class="header-sub">Расчёт показывает, как растёт выручка Авито при переходе партнёра на следующую ступень по объёму сделок. Для каждой ступени все сделки пересчитываются по TR Авито.</p>
+    <div><span class="assumption">Средняя стоимость лота: 6 500 000 ₽</span></div>
+  </div>
+
+  <div class="cards">
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка - 3%&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;2+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Группа компаний «Стратег»</div>
+          <div class="card-name">ЖК «Холмогоры»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка - 3%</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2+ сделок</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">26 000 ₽</span></td><td><span class="metric green">+25 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-0">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="2" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;1–3 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 4, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;4+ сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">АО «СЗ ИСК г. Уфы»</div>
+          <div class="card-name">ЖК «NOVALAND» (НОВАЛЭНД) · Литер 11-13</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1–3 сделок</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 13 000 ₽ до 39 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4+ сделок</div><div class="step-note">расчёт: 4 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">78 000 ₽</span></td><td><span class="metric green">+39 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-1">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="4" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;2+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">АО «СЗ ИСК г. Уфы»</div>
+          <div class="card-name">ЖК «Паруса»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2+ сделок</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">26 000 ₽</span></td><td><span class="metric green">+25 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-2">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="2" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;1-5 сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 6, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6+сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">АО «СЗ ИСК г. Уфы»</div>
+          <div class="card-name">ЖК «Маяковский»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-5 сделок</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 6 500 ₽ до 32 500 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6+сделок</div><div class="step-note">расчёт: 6 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">78 000 ₽</span></td><td><span class="metric green">+45 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-3">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="6" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 10, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;2–10 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Архстрой групп»</div>
+          <div class="card-name">ЖК «8 марта»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2–10 сделок</div><div class="step-note">расчёт: 2–10 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 26 000 ₽ до 130 000 ₽</span></td><td><span class="metric green">+129 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-4">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="2" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 2, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;1-2 сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;от 3х сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Архстрой групп»</div>
+          <div class="card-name">ЖК «Свой Берег»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-2 сделки</div><div class="step-note">расчёт: 1–2 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 6 500 ₽ до 13 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">от 3х сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">39 000 ₽</span></td><td><span class="metric green">+26 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-5">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 10, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;2–10 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Архстрой групп»</div>
+          <div class="card-name">ЖК «Цветы Башкирии» (Кварталы 24,25,26)</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2–10 сделок</div><div class="step-note">расчёт: 2–10 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 26 000 ₽ до 130 000 ₽</span></td><td><span class="metric green">+129 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-6">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="2" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 Сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;2 Сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3 и более Сделки&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">«Никольская» коллекция клубных домов</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 Сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 Сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">13 000 ₽</span></td><td><span class="metric green">+12 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">3 и более Сделки</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">39 000 ₽</span></td><td><span class="metric green">+26 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-7">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 6, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;4-6 сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 7, &quot;max&quot;: 7, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;7 сделок и более&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Суммируются ЦВЕТ ВЕТЕР РЕКА</div>
+          <div class="card-sub">ПШ за несколько ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4-6 сделок</div><div class="step-note">расчёт: 4–6 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 26 000 ₽ до 39 000 ₽</span></td><td><span class="metric green">+36 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">7 сделок и более</div><div class="step-note">расчёт: 7 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">91 000 ₽</span></td><td><span class="metric green">+52 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-8">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="7" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3 и более сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Суммируется КРИСТАЛЛ и НЕБО</div>
+          <div class="card-sub">ПШ за несколько ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">13 000 ₽</span></td><td><span class="metric green">+12 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">3 и более сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">39 000 ₽</span></td><td><span class="metric green">+26 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-9">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;2 сделки и более&quot;, &quot;trText&quot;: &quot;0,1%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">ЖК «Прайм»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки и более</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">13 000 ₽</span></td><td><span class="metric green">+12 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-10">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="2" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 2, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-2 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 4, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;3-4 сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 5, &quot;max&quot;: 5, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;5 сделок и более&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Квартал открытий «Луна»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-2 сделки</div><div class="step-note">расчёт: 1–2 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 2 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">3-4 сделки</div><div class="step-note">расчёт: 3–4 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 19 500 ₽ до 26 000 ₽</span></td><td><span class="metric green">+24 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">5 сделок и более</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">65 000 ₽</span></td><td><span class="metric green">+39 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-11">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="5" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 2, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-2 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;от 3-х сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Коллекция видовых квартир «ДИВО»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-2 сделки</div><div class="step-note">расчёт: 1–2 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 2 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">от 3-х сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">19 500 ₽</span></td><td><span class="metric green">+17 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-12">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 5, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;4-5 сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 6, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6 сделок и более&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Суммируется КАРЕТНАЯ 51 и ЭГО</div>
+          <div class="card-sub">ПШ за несколько ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4-5 сделок</div><div class="step-note">расчёт: 4–5 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 26 000 ₽ до 32 500 ₽</span></td><td><span class="metric green">+29 500 ₽</span></td></tr>
+          <tr><td><div class="step-label">6 сделок и более</div><div class="step-note">расчёт: 6 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">78 000 ₽</span></td><td><span class="metric green">+45 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-13">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="6" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 4, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;4 сделки и более&quot;, &quot;trText&quot;: &quot;0,1%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК Prime Development</div>
+          <div class="card-name">Комплекс апартаментов «Серп и молот»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4 сделки и более</div><div class="step-note">расчёт: 4 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">26 000 ₽</span></td><td><span class="metric green">+23 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-14">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="4" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки – 3 %&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 6, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;4-6 сделки – 4 %&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;6-9 сделки – 5 %&quot;, &quot;trText&quot;: &quot;0,3%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 10, &quot;tr&quot;: 0.004, &quot;label&quot;: &quot;10+ сделок – 6 %&quot;, &quot;trText&quot;: &quot;0,4%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Семейный»</div>
+          <div class="card-name">ЖК «Атмосфера»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки – 3 %</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4-6 сделки – 4 %</div><div class="step-note">расчёт: 4–6 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 52 000 ₽ до 78 000 ₽</span></td><td><span class="metric green">+75 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделки – 5 %</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 117 000 ₽ до 175 500 ₽</span></td><td><span class="metric green">+97 500 ₽</span></td></tr>
+          <tr><td><div class="step-label">10+ сделок – 6 %</div><div class="step-note">расчёт: 10 сдел.</div></td><td><span class="metric blue">0,4%</span></td><td><span class="revenue-metric">260 000 ₽</span></td><td><span class="metric green">+84 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-15">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки – 3 %&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 6, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;4-6 сделки – 4 %&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;6-9 сделки – 5 %&quot;, &quot;trText&quot;: &quot;0,3%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 10, &quot;tr&quot;: 0.004, &quot;label&quot;: &quot;10+ сделок – 6 %&quot;, &quot;trText&quot;: &quot;0,4%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Семейный»</div>
+          <div class="card-name">ЖК 7 Вершин</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки – 3 %</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4-6 сделки – 4 %</div><div class="step-note">расчёт: 4–6 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 52 000 ₽ до 78 000 ₽</span></td><td><span class="metric green">+75 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделки – 5 %</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 117 000 ₽ до 175 500 ₽</span></td><td><span class="metric green">+97 500 ₽</span></td></tr>
+          <tr><td><div class="step-label">10+ сделок – 6 %</div><div class="step-note">расчёт: 10 сдел.</div></td><td><span class="metric blue">0,4%</span></td><td><span class="revenue-metric">260 000 ₽</span></td><td><span class="metric green">+84 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-16">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 2, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-2 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 4, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3-4 сделки&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 5, &quot;max&quot;: 5, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;5+ сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Третий Трест»</div>
+          <div class="card-name">ЖК «Родина Парк» · литера 2-3</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-2 сделки</div><div class="step-note">расчёт: 1–2 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 2 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">3-4 сделки</div><div class="step-note">расчёт: 3–4 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 39 000 ₽ до 52 000 ₽</span></td><td><span class="metric green">+50 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">5+ сделок</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">97 500 ₽</span></td><td><span class="metric green">+45 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-17">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="5" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-3 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 6, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;4-6 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 7, &quot;max&quot;: 11, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;7-11 сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}, {&quot;min&quot;: 12, &quot;max&quot;: 12, &quot;tr&quot;: 0.004, &quot;label&quot;: &quot;12+ сделок&quot;, &quot;trText&quot;: &quot;0,4%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «Третий Трест»</div>
+          <div class="card-name">Экогород «Яркий»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-3 сделки</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4-6 сделок</div><div class="step-note">расчёт: 4–6 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 52 000 ₽ до 78 000 ₽</span></td><td><span class="metric green">+75 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">7-11 сделок</div><div class="step-note">расчёт: 7–11 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 136 500 ₽ до 214 500 ₽</span></td><td><span class="metric green">+136 500 ₽</span></td></tr>
+          <tr><td><div class="step-label">12+ сделок</div><div class="step-note">расчёт: 12 сдел.</div></td><td><span class="metric blue">0,4%</span></td><td><span class="revenue-metric">312 000 ₽</span></td><td><span class="metric green">+97 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-18">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="12" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;1–5 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 6, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;6 и более&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">АО «УЗЭМИК»</div>
+          <div class="card-name">ЖК «Vidineevsky» (Видинеевский)</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1–5 сделок</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 13 000 ₽ до 65 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6 и более</div><div class="step-note">расчёт: 6 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">117 000 ₽</span></td><td><span class="metric green">+52 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-19">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="6" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 3, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1–3 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 4, &quot;max&quot;: 7, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;4–7 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 8, &quot;max&quot;: 8, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;8+ сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ГК «СУ №1» (СУ 1)</div>
+          <div class="card-name">ЖК «Сердце Уфы»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1–3 сделки</div><div class="step-note">расчёт: 1–3 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 3 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">4–7 сделок</div><div class="step-note">расчёт: 4–7 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 52 000 ₽ до 91 000 ₽</span></td><td><span class="metric green">+88 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">8+ сделок</div><div class="step-note">расчёт: 8 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">156 000 ₽</span></td><td><span class="metric green">+65 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-20">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="8" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;1-5 Сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6-9 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 10, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;С 10 сделки&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">DARS Development</div>
+          <div class="card-name">ЖК «Город Природы»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-5 Сделки</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 6 500 ₽ до 32 500 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделок</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 78 000 ₽ до 117 000 ₽</span></td><td><span class="metric green">+84 500 ₽</span></td></tr>
+          <tr><td><div class="step-label">С 10 сделки</div><div class="step-note">расчёт: 10 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">195 000 ₽</span></td><td><span class="metric green">+78 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-21">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 4, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3–4 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 5, &quot;max&quot;: 5, &quot;tr&quot;: 0.005, &quot;label&quot;: &quot;5 сделок и больше&quot;, &quot;trText&quot;: &quot;0,5%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Талан</div>
+          <div class="card-name">Суммируются Бионика Парк и Конди Нова</div>
+          <div class="card-sub">ПШ за несколько ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">13 000 ₽</span></td><td><span class="metric green">+12 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">3–4 сделок</div><div class="step-note">расчёт: 3–4 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 39 000 ₽ до 52 000 ₽</span></td><td><span class="metric green">+39 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">5 сделок и больше</div><div class="step-note">расчёт: 5 сдел.</div></td><td><span class="metric blue">0,5%</span></td><td><span class="revenue-metric">162 500 ₽</span></td><td><span class="metric green">+110 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-22">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="5" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-5 сделок&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6-9 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 15, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;10-15 сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Новое время - Инвест</div>
+          <div class="card-name">ЖК «Матур»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-5 сделок</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 5 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделок</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 78 000 ₽ до 117 000 ₽</span></td><td><span class="metric green">+112 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">10-15 сделок</div><div class="step-note">расчёт: 10–15 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 195 000 ₽ до 292 500 ₽</span></td><td><span class="metric green">+175 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-23">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-5 сделок&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6-9 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 15, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;10-15 сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Новое время - Инвест</div>
+          <div class="card-name">ЖК «ЯРАТАУ»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-5 сделок</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 5 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделок</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 78 000 ₽ до 117 000 ₽</span></td><td><span class="metric green">+112 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">10-15 сделок</div><div class="step-note">расчёт: 10–15 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 195 000 ₽ до 292 500 ₽</span></td><td><span class="metric green">+175 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-24">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-5 сделок&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;6-9 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 15, &quot;tr&quot;: 0.003, &quot;label&quot;: &quot;10-15 сделок&quot;, &quot;trText&quot;: &quot;0,3%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Новое время - Инвест</div>
+          <div class="card-name">ЖК «Достояние»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-5 сделок</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 5 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделок</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">от 78 000 ₽ до 117 000 ₽</span></td><td><span class="metric green">+112 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">10-15 сделок</div><div class="step-note">расчёт: 10–15 сдел.</div></td><td><span class="metric blue">0,3%</span></td><td><span class="revenue-metric">от 195 000 ₽ до 292 500 ₽</span></td><td><span class="metric green">+175 500 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-25">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 2, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1-2 сделки&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 6, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;3-6 сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 7, &quot;max&quot;: 7, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;7 сделок и более&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Промстроймонтаж (ПСМ)</div>
+          <div class="card-name">ЖК «Формула»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1-2 сделки</div><div class="step-note">расчёт: 1–2 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 2 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">3-6 сделок</div><div class="step-note">расчёт: 3–6 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 19 500 ₽ до 39 000 ₽</span></td><td><span class="metric green">+37 000 ₽</span></td></tr>
+          <tr><td><div class="step-label">7 сделок и более</div><div class="step-note">расчёт: 7 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">91 000 ₽</span></td><td><span class="metric green">+52 000 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-26">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="7" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="6500000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+
+  function fmtMoney(value) {
+    return Math.round(value).toLocaleString('ru-RU') + ' ₽';
+  }
+  function fmtTr(value) {
+    if (value >= 1) return fmtMoney(value) + ' / сделка';
+    return (value * 100).toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + '%';
+  }
+  function revenue(deals, lot, tr) {
+    return tr >= 1 ? deals * tr : deals * lot * tr;
+  }
+  document.querySelectorAll('.scale-card').forEach((card) => {
+    const steps = JSON.parse(card.dataset.steps || '[]');
+    const dealsInput = card.querySelector('[data-role="deals"]');
+    const lotInput = card.querySelector('[data-role="lot"]');
+    const result = card.querySelector('[data-role="result"]');
+    const hint = card.querySelector('[data-role="hint"]');
+    function calculate() {
+      const deals = Math.max(1, Math.floor(Number(dealsInput.value || 0)));
+      const lot = Math.max(0, Number(lotInput.value || 0));
+      const step = steps.find((item) => deals >= item.min && deals <= item.max) || steps[steps.length - 1];
+      if (!step) return;
+      result.value = fmtMoney(revenue(deals, lot, step.tr));
+      hint.textContent = `Применена ступень: ${step.label}; TR Авито: ${step.trText || fmtTr(step.tr)}.`;
+    }
+    card.querySelector('[data-role="calc"]').addEventListener('click', calculate);
+    dealsInput.addEventListener('input', calculate);
+    lotInput.addEventListener('input', calculate);
+    calculate();
+  });
+
+</script>
+</body>
+</html>

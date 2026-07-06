@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Воронеж — цели по шкале</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F6F2;
+    --bg-card: #FFFFFF;
+    --text-primary: #1C1B18;
+    --text-secondary: #6B6860;
+    --text-muted: #A09D96;
+    --border: #E2E0D8;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --green: #0F6E56;
+    --green-light: #E1F5EE;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+  }
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  .page { max-width: 980px; margin: 0 auto; }
+  .header { margin-bottom: 28px; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .header-meta { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; background: var(--border); padding: 4px 10px; border-radius: 4px; white-space: nowrap; margin-top: 4px; }
+  .nda { color: var(--red); background: var(--red-light); border: 0.5px solid #E6BABA; }
+  .header-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.6; max-width: 720px; }
+  .assumption { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--amber); background: var(--amber-light); padding: 4px 10px; border-radius: 4px; margin-top: 10px; font-weight: 500; }
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+  .scale-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--border); gap: 12px; }
+  .card-dev { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  .card-name { font-size: 17px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; margin-top: 2px; }
+  .card-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+  .steps { width: 100%; border-collapse: collapse; }
+  .steps thead tr { background: #F7F6F2; }
+  .steps th { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 20px; text-align: left; border-bottom: 0.5px solid var(--border); }
+  .steps th:not(:first-child), .steps td:not(:first-child) { text-align: right; }
+  .steps td { padding: 11px 20px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  .step-label { font-weight: 500; color: var(--text-primary); }
+  .step-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .metric { font-family: 'JetBrains Mono', monospace; font-weight: 500; white-space: nowrap; }
+  .metric.blue { color: var(--blue); font-weight: 600; }
+  .metric.green { color: var(--green); font-weight: 600; }
+  .metric.muted { color: var(--text-muted); }
+  .revenue-metric { display: inline-flex; align-items: center; justify-content: flex-end; min-height: 28px; padding: 4px 9px; border-radius: 7px; background: var(--blue-light); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .calculator { padding: 14px 20px 16px; background: #FAFAF8; border-top: 0.5px solid var(--border); }
+  .calculator-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+  .calc-grid { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(180px, 1fr) auto minmax(180px, 1fr); gap: 10px; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+  input { height: 34px; border: 0.5px solid var(--border); border-radius: 6px; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); background: white; }
+  button { height: 34px; border: none; border-radius: 6px; padding: 0 14px; background: var(--blue); color: white; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+  output { min-height: 34px; display: flex; align-items: center; justify-content: flex-end; border: 0.5px solid #B2E2D5; background: var(--green-light); color: var(--green); border-radius: 6px; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+  .calc-hint { margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+  @media (max-width: 760px) {
+    body { padding: 20px 12px; }
+    .header-top { flex-direction: column; }
+    .steps th, .steps td { padding: 9px 10px; }
+    .calc-grid { grid-template-columns: 1fr; }
+    output { justify-content: flex-start; }
+  }
+  @media print {
+    body { background: white; padding: 16px; }
+    .scale-card { break-inside: avoid; }
+    .calculator { display: none; }
+  }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <h1>Воронеж — цели по шкале</h1>
+      <span class="header-meta nda">NDA · внутренний документ</span>
+    </div>
+    <p class="header-sub">Расчёт показывает, как растёт выручка Авито при переходе партнёра на следующую ступень по объёму сделок. Для каждой ступени все сделки пересчитываются по TR Авито.</p>
+    <div><span class="assumption">Средняя стоимость лота: 5 900 000 ₽</span></div>
+  </div>
+
+  <div class="cards">
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.0015, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,15%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ВДК</div>
+          <div class="card-name">ЖК «Бунин» · 1, 4, 5я оч</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,15%</span></td><td><span class="revenue-metric">17 700 ₽</span></td><td><span class="metric green">+16 700 ₽</span></td></tr>
+          <tr><td><div class="step-label">3+ сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">35 400 ₽</span></td><td><span class="metric green">+17 700 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-0">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="5900000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.0015, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,15%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ВДК</div>
+          <div class="card-name">ЖК «Городские сады»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,15%</span></td><td><span class="revenue-metric">17 700 ₽</span></td><td><span class="metric green">+16 700 ₽</span></td></tr>
+          <tr><td><div class="step-label">3+ сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">35 400 ₽</span></td><td><span class="metric green">+17 700 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-1">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="5900000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.0015, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,15%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ВДК</div>
+          <div class="card-name">ЖК «Гран-При»</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,15%</span></td><td><span class="revenue-metric">17 700 ₽</span></td><td><span class="metric green">+16 700 ₽</span></td></tr>
+          <tr><td><div class="step-label">3+ сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">35 400 ₽</span></td><td><span class="metric green">+17 700 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-2">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="5900000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 1, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;1 сделка&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 2, &quot;max&quot;: 2, &quot;tr&quot;: 0.0015, &quot;label&quot;: &quot;2 сделки&quot;, &quot;trText&quot;: &quot;0,15%&quot;}, {&quot;min&quot;: 3, &quot;max&quot;: 3, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;3+ сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">ВДК</div>
+          <div class="card-name">ЖК «Финский квартал» · секция 6</div>
+          <div class="card-sub">ПШ на один ЖК</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">1 сделка</div><div class="step-note">расчёт: 1 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">1 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">2 сделки</div><div class="step-note">расчёт: 2 сдел.</div></td><td><span class="metric blue">0,15%</span></td><td><span class="revenue-metric">17 700 ₽</span></td><td><span class="metric green">+16 700 ₽</span></td></tr>
+          <tr><td><div class="step-label">3+ сделок</div><div class="step-note">расчёт: 3 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">35 400 ₽</span></td><td><span class="metric green">+17 700 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-3">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="3" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="5900000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+
+    <section class="scale-card" data-steps="[{&quot;min&quot;: 1, &quot;max&quot;: 5, &quot;tr&quot;: 1000.0, &quot;label&quot;: &quot;база (1-5 сделок)&quot;, &quot;trText&quot;: &quot;1 000 ₽ / сделка&quot;}, {&quot;min&quot;: 6, &quot;max&quot;: 9, &quot;tr&quot;: 0.001, &quot;label&quot;: &quot;6-9 сделок&quot;, &quot;trText&quot;: &quot;0,1%&quot;}, {&quot;min&quot;: 10, &quot;max&quot;: 10, &quot;tr&quot;: 0.002, &quot;label&quot;: &quot;от 10 сделок&quot;, &quot;trText&quot;: &quot;0,2%&quot;}]">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-dev">Инстеп</div>
+          <div class="card-name">Все ЖК застройщика</div>
+          <div class="card-sub">ПШ на все ЖК Застройщика · ЖК Инстеп. Краснознаменная ЖК Инстеп.Бабяково</div>
+        </div>
+      </div>
+
+      <table class="steps">
+        <thead>
+          <tr>
+            <th>Шкала</th>
+            <th>TR Авито</th>
+            <th>Выручка на ступени</th>
+            <th>Инкремент</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="step-label">база (1-5 сделок)</div><div class="step-note">расчёт: 1–5 сдел.</div></td><td><span class="metric blue">1 000 ₽ / сделка</span></td><td><span class="revenue-metric">от 1 000 ₽ до 5 000 ₽</span></td><td><span class="metric muted">—</span></td></tr>
+          <tr><td><div class="step-label">6-9 сделок</div><div class="step-note">расчёт: 6–9 сдел.</div></td><td><span class="metric blue">0,1%</span></td><td><span class="revenue-metric">от 35 400 ₽ до 53 100 ₽</span></td><td><span class="metric green">+48 100 ₽</span></td></tr>
+          <tr><td><div class="step-label">от 10 сделок</div><div class="step-note">расчёт: 10 сдел.</div></td><td><span class="metric blue">0,2%</span></td><td><span class="revenue-metric">118 000 ₽</span></td><td><span class="metric green">+64 900 ₽</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="calculator" id="calc-4">
+        <div class="calculator-title">Посчитай потенциальный эффект на выручку</div>
+        <div class="calc-grid">
+          <label>Объём сделок<input type="number" min="1" step="1" value="10" data-role="deals"></label>
+          <label>Стоимость лота<input type="number" min="0" step="100000" value="5900000" data-role="lot"></label>
+          <button type="button" data-role="calc">Посчитать</button>
+          <output data-role="result">—</output>
+        </div>
+        <div class="calc-hint" data-role="hint">TR будет выбран автоматически по шкале группы.</div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+
+  function fmtMoney(value) {
+    return Math.round(value).toLocaleString('ru-RU') + ' ₽';
+  }
+  function fmtTr(value) {
+    if (value >= 1) return fmtMoney(value) + ' / сделка';
+    return (value * 100).toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + '%';
+  }
+  function revenue(deals, lot, tr) {
+    return tr >= 1 ? deals * tr : deals * lot * tr;
+  }
+  document.querySelectorAll('.scale-card').forEach((card) => {
+    const steps = JSON.parse(card.dataset.steps || '[]');
+    const dealsInput = card.querySelector('[data-role="deals"]');
+    const lotInput = card.querySelector('[data-role="lot"]');
+    const result = card.querySelector('[data-role="result"]');
+    const hint = card.querySelector('[data-role="hint"]');
+    function calculate() {
+      const deals = Math.max(1, Math.floor(Number(dealsInput.value || 0)));
+      const lot = Math.max(0, Number(lotInput.value || 0));
+      const step = steps.find((item) => deals >= item.min && deals <= item.max) || steps[steps.length - 1];
+      if (!step) return;
+      result.value = fmtMoney(revenue(deals, lot, step.tr));
+      hint.textContent = `Применена ступень: ${step.label}; TR Авито: ${step.trText || fmtTr(step.tr)}.`;
+    }
+    card.querySelector('[data-role="calc"]').addEventListener('click', calculate);
+    dealsInput.addEventListener('input', calculate);
+    lotInput.addEventListener('input', calculate);
+    calculate();
+  });
+
+</script>
+</body>
+</html>
